@@ -9,6 +9,8 @@ import GlobalErrorHandler from "./domain/errors/global.error.handler"
 import accountRouter from "./api/account"
 import inventoryRouter from "./api/inventory"
 import expenseRouter from "./api/expense"
+import orderRouter from "./api/order"
+import summaryRouter from "./api/summary"
 
 dotenv.config()
 
@@ -45,6 +47,8 @@ app.get("/", (_req, res) => {
 app.use('/user/account', accountRouter)
 app.use("/user/inventory", inventoryRouter)
 app.use("/user/expense", expenseRouter)
+app.use("/user/order", orderRouter)
+app.use("/user/summary", summaryRouter)
 app.use(GlobalErrorHandler)
 
 
