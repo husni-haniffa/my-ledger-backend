@@ -11,6 +11,7 @@ import inventoryRouter from "./api/inventory"
 import expenseRouter from "./api/expense"
 import orderRouter from "./api/order"
 import summaryRouter from "./api/summary"
+import billingRouter from "./api/billing"
 
 dotenv.config()
 
@@ -49,6 +50,7 @@ app.use("/user/inventory", inventoryRouter)
 app.use("/user/expense", expenseRouter)
 app.use("/user/order", orderRouter)
 app.use("/user/summary", summaryRouter)
+app.use("/user/billing", billingRouter)
 app.use(GlobalErrorHandler)
 
 

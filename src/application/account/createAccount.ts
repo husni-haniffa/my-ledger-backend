@@ -37,7 +37,7 @@ export const createAccount = async (req: Request, res: Response) => {
     const { data: plan, error: planError } = await supabaseAdmin
         .from("plans")
         .select("id, trial_days")
-        .eq("slug", "pro")
+        .eq("slug", "free")
         .eq("is_active", true)
         .single()
 
