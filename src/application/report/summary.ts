@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { getReportDateRange, ReportRange } from "../../domain/helpers/getReportDateRange";
 import { getDashboardSummary } from "./helpers/getSummary";
+import { getAuth } from "@clerk/express";
+import { UnauthorizedError } from "../../domain/errors/errors";
+import { getUserStore } from "../../domain/helpers/getUserStore";
 
 export const getSummary = async (
     req: Request,
@@ -10,10 +13,13 @@ export const getSummary = async (
     try {
         const range = String(req.query.range || "7d") as ReportRange
 
-        // temporary for now
-        const storeId = 1
+        const { userId } = getAuth(req)
+        if(!userId) {
+            throw new UnauthorizedError('UnAuthorized')
+        }
+        const store = await getUserStore(userId)
 
-        const dashboard = await getDashboardSummary(storeId, range)
+        const dashboard = await getDashboardSummary(store.id, range)
 
         return res.json({
             data: dashboard,
