@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(
     cors({
         origin: [
-            "http://localhost:3000",
+            "https://my-ledger-frontend.vercel.app",
         ],
         credentials: true,
     })
