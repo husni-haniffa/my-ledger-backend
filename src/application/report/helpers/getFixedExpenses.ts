@@ -13,6 +13,7 @@ export async function getFixedExpenses(
         .select("amount, expense_type")
         .eq("store_id", storeId)
         .eq("expense_type", "fixed")
+        .is("deleted_at", null)
         .gte("expense_date", startDateOnly)
         .lte("expense_date", endDateOnly)
 

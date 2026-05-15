@@ -16,6 +16,7 @@ export async function getOutstandingPayments(
     .eq("store_id", storeId)
     .eq("payment_status", "pending")
     .not("status", "in", '("cancelled","returned")')
+    .is("deleted_at", null)
     .gte("ordered_at", startDate)
     .lte("ordered_at", endDate)
 

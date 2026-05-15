@@ -10,6 +10,7 @@ export async function getRevenue(
         .select("total_amount")
         .eq("store_id", storeId)
         .eq("status", "delivered")
+        .is("deleted_at", null)
         .gte("ordered_at", startDate)
         .lte("ordered_at", endDate)
 
