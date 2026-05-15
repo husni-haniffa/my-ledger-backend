@@ -48,9 +48,12 @@ export const createOrder = async (req: Request, res: Response) => {
             payment_method: payload.payment_method,
             source: payload.source,
 
+            subtotal: 0,
             discount_type: payload.discount_type,
             discount_value: payload.discount_value,
+            discount_amount: 0,
             delivery_fee: payload.delivery_fee,
+            total_amount: payload.delivery_fee,
 
             notes: payload.notes || null,
         })
