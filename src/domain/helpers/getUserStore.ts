@@ -7,6 +7,10 @@ export async function getUserStore(clerkUserId: string) {
       id,
       stores (
         id,
+        name,
+        email,
+        phone_number,
+        address,
         status
       )
     `)

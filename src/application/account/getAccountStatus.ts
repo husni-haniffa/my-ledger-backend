@@ -7,7 +7,7 @@ export const getAccountStatus = async (req: Request, res: Response) => {
     const { userId } = getAuth(req)
 
     if (!userId) {
-        throw new UnauthorizedError('UnAuthorized')
+        throw new UnauthorizedError("Unauthorized")
     }
 
     const { data: user, error } = await supabaseAdmin
@@ -44,13 +44,11 @@ export const getAccountStatus = async (req: Request, res: Response) => {
     `)
         .eq("clerk_user_id", userId)
         .maybeSingle()
-    
 
     if (error) {
-       throw new Error(error.message)
+        throw new Error(error.message)
     }
 
-    // 1. User does not exist in our database yet
     if (!user) {
         return res.status(200).json({
             hasAccount: false,
@@ -66,7 +64,6 @@ export const getAccountStatus = async (req: Request, res: Response) => {
         ? user.subscriptions[0]
         : user.subscriptions
 
-    // 2. User exists, but store/subscription missing
     if (!store || !subscription) {
         return res.status(200).json({
             hasAccount: false,
@@ -83,11 +80,47 @@ export const getAccountStatus = async (req: Request, res: Response) => {
     const now = new Date()
     const periodEnd = new Date(subscription.current_period_end)
 
-    const isValidSubscription =
-        (subscription.status === "trialing" || subscription.status === "active") &&
-        periodEnd >= now
+    let finalSubscription = subscription
 
-    // 3. User can access dashboard
+    if (
+        periodEnd < now &&
+        (subscription.status === "trialing" || subscription.status === "active")
+    ) {
+        const { data: updatedSubscription, error: updateError } =
+            await supabaseAdmin
+                .from("subscriptions")
+                .update({
+                    status: "expired",
+                })
+                .eq("id", subscription.id)
+                .select(`
+          id,
+          status,
+          current_period_end,
+          trial_end,
+          plans (
+            id,
+            name,
+            slug,
+            price,
+            currency,
+            billing_period
+          )
+        `)
+                .single()
+
+        if (updateError) {
+            throw new Error(updateError.message)
+        }
+
+        finalSubscription = updatedSubscription
+    }
+
+    const isValidSubscription =
+        (finalSubscription.status === "trialing" ||
+            finalSubscription.status === "active") &&
+        new Date(finalSubscription.current_period_end) >= now
+
     if (isValidSubscription && store.status === "active") {
         return res.status(200).json({
             hasAccount: true,
@@ -100,12 +133,11 @@ export const getAccountStatus = async (req: Request, res: Response) => {
                     status: user.status,
                 },
                 store,
-                subscription,
+                subscription: finalSubscription,
             },
         })
     }
 
-    // 4. User exists, but subscription expired/not active
     return res.status(200).json({
         hasAccount: true,
         hasAccess: false,
@@ -117,7 +149,7 @@ export const getAccountStatus = async (req: Request, res: Response) => {
                 status: user.status,
             },
             store,
-            subscription,
+            subscription: finalSubscription,
         },
     })
 }

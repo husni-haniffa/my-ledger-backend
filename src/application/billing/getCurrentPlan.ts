@@ -43,8 +43,55 @@ export const getCurrentPlan = async (
             throw new Error(error.message)
         }
 
+        if (!data) {
+            return res.status(200).json({
+                data: null,
+            })
+        }
+
+        const now = new Date()
+        const periodEnd = new Date(data.current_period_end)
+
+        if (
+            periodEnd < now &&
+            (data.status === "trialing" || data.status === "active")
+        ) {
+            const { data: updatedSubscription, error: updateError } =
+                await supabaseAdmin
+                    .from("subscriptions")
+                    .update({
+                        status: "expired",
+                    })
+                    .eq("id", data.id)
+                    .select(`
+            id,
+            status,
+            trial_start,
+            trial_end,
+            current_period_start,
+            current_period_end,
+            cancelled_at,
+            plans (
+              name,
+              slug,
+              price,
+              currency,
+              billing_period
+            )
+          `)
+                    .single()
+
+            if (updateError) {
+                throw new Error(updateError.message)
+            }
+
+            return res.status(200).json({
+                data: updatedSubscription,
+            })
+        }
+
         return res.status(200).json({
-            data
+            data,
         })
     } catch (error) {
         next(error)
