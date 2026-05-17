@@ -12,6 +12,7 @@ import expenseRouter from "./api/expense"
 import orderRouter from "./api/order"
 import summaryRouter from "./api/summary"
 import billingRouter from "./api/billing"
+import adminRouter from "./api/admin"
 
 dotenv.config()
 
@@ -32,7 +33,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(
     cors({
         origin: [
-            "https://my-ledger-frontend.vercel.app",
+            "https://my-ledger-frontend.vercel.app", "http://localhost:3000"
         ],
         credentials: true,
     })
@@ -50,6 +51,7 @@ app.use("/user/expense", expenseRouter)
 app.use("/user/order", orderRouter)
 app.use("/user/summary", summaryRouter)
 app.use("/user/billing", billingRouter)
+app.use("/admin", adminRouter)
 app.use(GlobalErrorHandler)
 
 

@@ -12,6 +12,7 @@ export async function getTotalExpenses(
         .from("expenses")
         .select("amount")
         .eq("store_id", storeId)
+        .is("deleted_at", null)
         .gte("expense_date", startDateOnly)
         .lte("expense_date", endDateOnly)
 

@@ -16,6 +16,7 @@ export async function getGrossProfit(
     `)
         .eq("store_id", storeId)
         .eq("status", "delivered")
+        .is("deleted_at", null)
         .gte("ordered_at", startDate)
         .lte("ordered_at", endDate)
 
