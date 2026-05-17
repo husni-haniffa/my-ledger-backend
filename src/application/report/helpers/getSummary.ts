@@ -1,4 +1,5 @@
 import { ReportRange, getReportDateRange } from "../../../domain/helpers/getReportDateRange"
+import { getExpenses } from "./getExpenses"
 import { getFixedExpenses } from "./getFixedExpenses"
 import { getGrossProfit } from "./getGrossProfit"
 import { getLowStockItems } from "./getLowStockItems"
@@ -24,6 +25,7 @@ export async function getDashboardSummary(
         lowStockItems,
         topSellingProducts,
         salesBySource,
+        expenses,
     ] = await Promise.all([
         getRevenue(storeId, startDate, endDate),
         getGrossProfit(storeId, startDate, endDate),
@@ -33,6 +35,7 @@ export async function getDashboardSummary(
         getLowStockItems(storeId),
         getTopSellingProducts(storeId, startDate, endDate),
         getSalesBySource(storeId, startDate, endDate),
+        getExpenses(storeId, startDate, endDate)
     ])
 
     const netProfit = await getNetProfit(grossProfit, totalExpenses)
@@ -66,5 +69,10 @@ export async function getDashboardSummary(
         sales: {
             salesBySource,
         },
+        expenses: {
+            fixedExpenses: expenses.fixedExpenses,
+            variableExpenses: expenses.variableExpenses,
+            otherExpenses: expenses.otherExpenses
+        }
     }
 }
